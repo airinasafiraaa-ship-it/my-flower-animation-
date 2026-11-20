@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loves Me or Loves Me Not 🌼</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#071b50;color:white;
+ text-align:center;font-family:Georgia,serif;
+ overflow:hidden;
+}
+h1{color:#ffacd2;margin:22px 5px;font-size:27px}
+canvas{width:100%;max-width:600px;height:auto}
+button{
+ background:#a63e79;color:white;border:1px solid pink;
+ padding:12px 20px;border-radius:25px;
+ margin:5px;font-size:15px;
+}
+</style>
+</head>
+<body>
+
+<h1 id="title">LOVES ME 🌼</h1>
+<canvas id="flower" width="600" height="650"></canvas>
+<br>
+<button onclick="pick()">Pick a Petal 🌸</button>
+<button onclick="reset()">Start Again</button>
+
+<script>
+const c=document.getElementById("flower");
+const ctx=c.getContext("2d");
+const title=document.getElementById("title");
+
+let petals=Array.from({length:8},(_,i)=>i);
+let falling=[];
+let hearts=[];
+
+function background(){
+ let g=ctx.createLinearGradient(0,0,0,650);
+ g.addColorStop(0,"#061642");
+ g.addColorStop(1,"#164c27");
+ ctx.fillStyle=g;
+ ctx.fillRect(0,0,600,650);
+
+ // Stars
+ for(let i=0;i<70;i++){
+  let x=(i*97)%600;
+  let y=(i*61)%430;
+  ctx.fillStyle="white";
+  ctx.fillRect(x,y,2,2);
+ }
+
+ // Moon
+ ctx.fillStyle="#fff2bd";
+ ctx.beginPath();
+ ctx.arc(500,90,35,0,Math.PI*2);
+ ctx.fill();
+
+ // Mountains
+ ctx.fillStyle="#172e66";
+ ctx.beginPath();
+ ctx.moveTo(0,480);
+ ctx.lineTo(150,380);
+ ctx.lineTo(300,480);
+ ctx.lineTo(450,390);
+ ctx.lineTo(600,480);
+ ctx.lineTo(600,650);
+ ctx.lineTo(0,650);
+ ctx.fill();
+}
+
+function drawPetal(x,y,a){
+ ctx.save();
+ ctx.translate(x,y);
+ ctx.rotate(a);
+ ctx.fillStyle="#fffdf7";
+ ctx.beginPath();
+ ctx.ellipse(0,-42,15,39,0,0,Math.PI*2);
+ ctx.fill();
+ ctx.restore();
+}
+
+function flower(){
+ let x=300,y=390;
+
+ // Stem
+ ctx.strokeStyle="#35a34d";
+ ctx.lineWidth=10;
+ ctx.beginPath();
+ ctx.moveTo(x,y);
+ ctx.lineTo(x,630);
+ ctx.stroke();
+
+ // Leaves
+ ctx.fillStyle="#269447";
+ ctx.beginPath();
+ ctx.ellipse(260,510,45,15,-.3,0,Math.PI*2);
+ ctx.fill();
+
+ ctx.beginPath();
+ ctx.ellipse(340,565,45,15,.3,0,Math.PI*2);
+ ctx.fill();
+
+ // Petals
+ petals.forEach(i=>{
+  drawPetal(x,y,i*Math.PI/4);
+ });
+
+ // Flower centre
+ ctx.fillStyle="#ffb52e";
+ ctx.beginPath();
+ ctx.arc(x,y,30,0,Math.PI*2);
+ ctx.fill();
+}
+
+function pick(){
+ if(petals.length===0)return;
+
+ let i=petals.pop();
+ let a=i*Math.PI/4;
+
+ falling.push({
+  x:300+Math.sin(a)*45,
+  y:390-Math.cos(a)*45,
+  speed:2
+ });
+
+ title.textContent=
+ petals.length%2===0?"LOVES ME 💗":"LOVES ME NOT 💔";
+
+ if(petals.length===0){
+  title.textContent="LOVE IS IN THE AIR ❤️";
+  for(let i=0;i<20;i++){
+   hearts.push({
+    x:250+Math.random()*100,
+    y:350+Math.random()*100
+   });
+  }
+ }
+}
+
+function reset(){
+ petals=Array.from({length:8},(_,i)=>i);
+ falling=[];
+ hearts=[];
+ title.textContent="LOVES ME 🌼";
+}
+
+function animate(){
+ background();
+ flower();
+
+ // Falling petals
+ falling.forEach(p=>{
+  p.y+=p.speed;
+  p.x+=Math.sin(p.y/20);
+  drawPetal(p.x,p.y,.5);
+ });
+
+ // Floating hearts
+ hearts.forEach(h=>{
+  h.y-=1.2;
+  ctx.fillStyle="#ff5b9b";
+  ctx.font="25px Arial";
+  ctx.fillText("♥",h.x,h.y);
+ });
+
+ requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+</body>
+</html>
